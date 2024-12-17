@@ -1,2 +1,2 @@
 # Mango-Voxels
-voxel engine in C
+voxel engine in C++
