@@ -7,26 +7,105 @@
 
 #include <iostream>
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow *window);
-
-
-// // Camera
-// class Camera {
-//     public:
-//     glm::vec3 position;
-
-//     glm::vec3 movementSpeed;
-
-//     glm::vec3 mouseSensitivity;
-// }
-
-
+#define POSITIVE_PITCH_LIMIT 90.0f
+#define NEGATIVE_PITCH_LIMIT -90.0f
 
 // settings
 const unsigned int SCR_WIDTH = 1440;
 const unsigned int SCR_HEIGHT = 900;
 
+
+bool firstMouse = true;
+float lastX = SCR_WIDTH / 2.0f;
+float lastY = SCR_HEIGHT / 2.0f;
+
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void processInput(GLFWwindow *window);
+
+
+// Camera setup
+class Camera {
+    public:
+        // vector 3 to store the various camera data
+        glm::vec3 position;
+        glm::vec3 front;
+        glm::vec3 up;
+        glm::vec3 right;
+        glm::vec3 worldUp;
+
+        // player stats
+        float movementSpeed;
+        // settings 
+        float mouseSensitivity;
+        float zoom;
+        // stores the camera angles
+        float yaw; // look left and right
+        float pitch; // up and down
+
+        Camera(glm::vec3 startPosition) : front(glm::vec3(0.0f, 0.0f, -1.0f)),
+        up(glm::vec3(0.0f, 1.0f, 0.0f)),
+        right(glm::vec3(1.0f, 0.0f, 0.0f)),
+        worldUp(glm::vec3(0.0f, 1.0f, 0.0f)),
+        yaw(-90.0f),
+        pitch(0.0f),
+        movementSpeed(2.5f),
+        mouseSensitivity(0.1f),
+        zoom(45.0f) {
+            position = startPosition;
+        }
+
+        void processKeyboard(GLFWwindow *window, float deltaTime){
+            float velocity = movementSpeed * deltaTime;
+            if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
+                // W key has been pressed
+                position += front * velocity;
+            } 
+            if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS){
+                // S key has been pressed
+                position -= front * velocity;
+            } 
+            if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS){
+                // D key has been pressed
+                position += right * velocity;
+            } 
+            if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS){
+                // A key has been pressed
+                position -= right * velocity;
+            } 
+        }
+
+        void processMouseMovement(float xOffset, float yOffset, GLboolean constrainPitch = true){
+            xOffset *= mouseSensitivity;
+            yOffset *= mouseSensitivity;
+            yaw += xOffset;
+            pitch += yOffset;
+            if (pitch > 90.0f){
+                pitch = 90.0f;
+            } else if (pitch < -90.0f){
+                pitch = -90.0f;
+            }
+            updateCameraVectors();
+        }
+
+    private:
+        void updateCameraVectors(){
+            glm::vec3 tempFront;
+            // tempFront.x = 
+        }
+
+};
+
+void mouseCallback(GLFWwindow *window, double xpos, double ypos){
+    if (firstMouse) {
+        lastX = xpos;
+        lastY= ypos;
+        firstMouse = false;
+    }
+    float xOffset = xpos - lastX;
+    float yOffset = ypos - lastY;
+    // use camera to process mouse movement
+}
 const char *vertexShaderSource = "#version 330 core\n"
     "layout (location = 0) in vec3 aPos;\n"
     "void main()\n"
@@ -144,6 +223,13 @@ int main()
 
     // uncomment this call to draw in wireframe polygons.
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+
+    // Camera initialise
+    Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+
+    // Cursour callback
+    glfwSetCursorPosCallback(window, mouseCallback);
 
     // render loop
     // -----------
