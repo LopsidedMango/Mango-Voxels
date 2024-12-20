@@ -119,6 +119,12 @@ const char *fragmentShaderSource = "#version 330 core\n"
     "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
     "}\n\0";
 
+const char *blueFragmentShaderSource = "#version 330 core\n"
+    
+    ;
+
+
+
 int main()
 {
     // glfw: initialize and configure
@@ -201,6 +207,33 @@ int main()
          0.0f,  0.5f, 0.0f  // top   
     }; 
 
+    float squareVertices[] = {
+        0.6f,  0.6f, 0.0f,  // top-right
+        0.6f, -0.6f, 0.0f,  // bottom-right
+        -0.6f, -0.6f, 0.0f,  // bottom-left
+
+        // Second triangle
+        0.6f,  0.6f, 0.0f,  // top-right
+        -0.6f, -0.6f, 0.0f,  // bottom-left
+        -0.6f,  0.6f, 0.0f   // top-left
+    };
+
+    unsigned int squareVBO, squareVAO;
+    glGenVertexArrays(1, &squareVAO);
+    glGenBuffers(1, &squareVBO);
+
+    glBindVertexArray(squareVAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, squareVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(squareVertices), squareVertices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
+
     unsigned int VBO, VAO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -226,7 +259,7 @@ int main()
 
 
     // Camera initialise
-    Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+    // Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
     // Cursour callback
     glfwSetCursorPosCallback(window, mouseCallback);
